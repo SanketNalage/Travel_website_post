@@ -28,14 +28,5 @@ services:
     depends_on:
       - backend
 
-  redis:
-    container_name: redis-service
-    restart: unless-stopped
-    image: redis:7.0.5-alpine
-    expose:
-      - 6379
-    depends_on:
-      - mongodb
-
 volumes:
   data:
