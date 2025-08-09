@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'rohan' }
     environment {
         SONAR_HOME = tool 'Sonar'
     }
@@ -9,11 +9,10 @@ pipeline {
                 git url: 'https://github.com/SanketNalage/Travel_website_post.git', branch: 'main'
             }
         }
-    }
 
         stage('SonarQube Quality Analysis') {
             steps {
-                withSonarQubeEnv('Sonar') {
+                withSonarQubeEnv('Sonar-rohan') { // Must match SonarQube Server name in Jenkins
                     sh """
                         $SONAR_HOME/bin/sonar-scanner \
                         -Dsonar.projectKey=wanderlust \
@@ -21,13 +20,6 @@ pipeline {
                         -Dsonar.sources=.
                     """
                 }
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.html'
             }
         }
 
@@ -39,6 +31,13 @@ pipeline {
             }
         }
 
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.html'
+            }
+        }
+
         stage('Trivy File Scan') {
             steps {
                 sh '''
@@ -46,6 +45,7 @@ pipeline {
                 '''
             }
         }
+
         stage('Docker Deploy Project') {
             steps {
                 sh '''
