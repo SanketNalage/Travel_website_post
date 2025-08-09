@@ -11,53 +11,53 @@ pipeline {
         }
     }
 
-    //     stage('SonarQube Quality Analysis') {
-    //         steps {
-    //             withSonarQubeEnv('Sonar') {
-    //                 sh """
-    //                     $SONAR_HOME/bin/sonar-scanner \
-    //                     -Dsonar.projectKey=wanderlust \
-    //                     -Dsonar.projectName=wanderlust \
-    //                     -Dsonar.sources=.
-    //                 """
-    //             }
-    //         }
-    //     }
+        stage('SonarQube Quality Analysis') {
+            steps {
+                withSonarQubeEnv('Sonar') {
+                    sh """
+                        $SONAR_HOME/bin/sonar-scanner \
+                        -Dsonar.projectKey=wanderlust \
+                        -Dsonar.projectName=wanderlust \
+                        -Dsonar.sources=.
+                    """
+                }
+            }
+        }
 
-    //     stage('OWASP Dependency Check') {
-    //         steps {
-    //             dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
-    //             dependencyCheckPublisher pattern: '**/dependency-check-report.html'
-    //         }
-    //     }
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.html'
+            }
+        }
 
-    //     stage('Sonar Quality Gate') {
-    //         steps {
-    //             timeout(time: 2, unit: 'MINUTES') {
-    //                 waitForQualityGate abortPipeline: false
-    //             }
-    //         }
-    //     }
+        stage('Sonar Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: false
+                }
+            }
+        }
 
-    //     stage('Trivy File Scan') {
-    //         steps {
-    //             sh '''
-    //                trivy fs --format json -o trivy-fs-report.json .
-    //             '''
-    //         }
-    //     }
-    //     stage('Docker Deploy Project') {
-    //         steps {
-    //             sh '''
-    //                 docker compose up -d
-    //             '''
-    //         }
-    //     }
-    // }
-    // post {
-    //     always {
-    //         echo 'Pipeline execution finished!'
-    //         archiveArtifacts artifacts: '**/*.html,**/*.json', allowEmptyArchive: true
-    //     }
-    // }
+        stage('Trivy File Scan') {
+            steps {
+                sh '''
+                   trivy fs --format json -o trivy-fs-report.json .
+                '''
+            }
+        }
+        stage('Docker Deploy Project') {
+            steps {
+                sh '''
+                    docker compose up -d
+                '''
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline execution finished!'
+            archiveArtifacts artifacts: '**/*.html,**/*.json', allowEmptyArchive: true
+        }
+    }
 }
